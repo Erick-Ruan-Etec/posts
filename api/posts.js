@@ -96,7 +96,7 @@ module.exports = async function handler(req, res) {
                 updatedAt: new Date().toISOString(),
             };
             await put(`${POSTS_PREFIX}${id}.json`, JSON.stringify(post), {
-                access: "private",
+                access: "public",
                 contentType: "application/json",
                 token: BLOB_TOKEN,
             });

@@ -75,7 +75,7 @@ module.exports = async function handler(req, res) {
                 createdAt: new Date().toISOString(),
             };
             await put(`${prefix}${id}.json`, JSON.stringify(comment), {
-                access: "private",
+                access: "public",
                 contentType: "application/json",
                 token: BLOB_TOKEN,
             });
