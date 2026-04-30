@@ -1,5 +1,5 @@
 // api/posts.js — CommonJS (compatível com Vercel Serverless)
-const { put, list, del, get } = require("@vercel/blob");
+const { put, list, del } = require("@vercel/blob");
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "admin123";
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
@@ -34,12 +34,8 @@ module.exports = async function handler(req, res) {
                 blobs
                     .filter((b) => b.pathname.endsWith(".json"))
                     .map(async (b) => {
-                        const blob = await get(b.url, {
-                            access: "private",
-                            token: BLOB_TOKEN,
-                        });
-                        const text = await new Response(blob.stream).text();
-                        return JSON.parse(text);
+                        const r = await fetch(b.downloadUrl);
+                        return r.json();
                     }),
             );
             posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -62,12 +58,8 @@ module.exports = async function handler(req, res) {
             });
             if (!blobs.length)
                 return json(res, 404, { error: "Post não encontrado" });
-            const blob = await get(blobs[0].url, {
-                access: "private",
-                token: BLOB_TOKEN,
-            });
-            const text = await new Response(blob.stream).text();
-            return json(res, 200, JSON.parse(text));
+            const r = await fetch(blobs[0].downloadUrl);
+            return json(res, 200, await r.json());
         } catch (err) {
             console.error("posts GET id error:", err);
             return json(res, 500, {
