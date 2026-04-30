@@ -1,5 +1,5 @@
 // api/comments.js — CommonJS
-const { put, list, del, download } = require("@vercel/blob");
+const { put, list, del, get } = require("@vercel/blob");
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "admin123";
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
@@ -35,10 +35,11 @@ module.exports = async function handler(req, res) {
                 blobs
                     .filter((b) => b.pathname.endsWith(".json"))
                     .map(async (b) => {
-                        const { body } = await download(b.url, {
+                        const blob = await get(b.url, {
+                            access: "private",
                             token: BLOB_TOKEN,
                         });
-                        const text = await new Response(body).text();
+                        const text = await new Response(blob.stream).text();
                         return JSON.parse(text);
                     }),
             );
