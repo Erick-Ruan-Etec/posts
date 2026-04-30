@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e0e0e;
+      --surface: #161616;
+      --surface2: #1c1c1c;
+      --border: #2a2a2a;
+      --text: #f0ece4;
+      --muted: #888;
+      --accent: #e8c97e;
+      --danger: #e05c5c;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1.5rem, 5vw, 3rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      background: rgba(14,14,14,0.95);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(232,201,126,0.15);
+      color: var(--accent);
+      padding: 3px 10px;
+      border-radius: 2px;
+      margin-left: 0.8rem;
+    }
+
+    .header-right { display: flex; gap: 1rem; align-items: center; }
+
+    .btn-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .btn-logout {
+      font-size: 0.78rem;
+      color: var(--danger);
+      background: none;
+      border: 1px solid var(--danger);
+      border-radius: 3px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.05em;
+      transition: background 0.2s;
+    }
+    .btn-logout:hover { background: rgba(224,92,92,0.1); }
+
+    /* ── Login screen ── */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 64px);
+      padding: 2rem;
+    }
+
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .login-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .login-box p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.8rem;
+    }
+
+    /* ── Forms ── */
+    label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      padding: 0.7rem 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    input:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 200px; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0e0e0e;
+      border: none;
+      border-radius: 3px;
+      padding: 0.75rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      width: 100%;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .status-msg {
+      font-size: 0.82rem;
+      margin-top: 0.6rem;
+      min-height: 1.2em;
+    }
+    .status-msg.ok { color: #6fcf97; }
+    .status-msg.err { color: #eb5757; }
+
+    /* ── Admin panel ── */
+    #admin-panel { display: none; }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 0;
+      min-height: calc(100vh - 64px);
+    }
+
+    @media (max-width: 800px) {
+      .admin-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Left: form */
+    .panel-form {
+      border-right: 1px solid var(--border);
+      padding: 2rem clamp(1.5rem, 3vw, 2.5rem);
+    }
+
+    .panel-form h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .color-row input[type="color"] {
+      width: 42px;
+      height: 36px;
+      padding: 2px;
+      border-radius: 3px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .color-label { font-size: 0.82rem; color: var(--muted); }
+
+    .tags-hint { font-size: 0.75rem; color: var(--muted); margin-top: -0.6rem; margin-bottom: 1rem; }
+
+    /* Right: post list */
+    .panel-list {
+      padding: 2rem clamp(1.5rem, 3vw, 2.5rem);
+      overflow-y: auto;
+      max-height: calc(100vh - 64px);
+    }
+
+    .panel-list h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .post-count {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+    }
+
+    .admin-post-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .apost-info { flex: 1; min-width: 0; }
+
+    .apost-cover {
+      width: 4px;
+      align-self: stretch;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .apost-title {
+      font-weight: 500;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .apost-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .apost-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+
+    .btn-view, .btn-delete {
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      border: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn-view {
+      background: rgba(232,201,126,0.1);
+      color: var(--accent);
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-delete {
+      background: rgba(224,92,92,0.1);
+      color: var(--danger);
+    }
+
+    .btn-view:hover, .btn-delete:hover { opacity: 0.7; }
+
+    .spinner {
+      width: 26px; height: 26px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 2rem auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-msg { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 2rem 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center">
+    <a href="/" class="logo">The Blog</a>
+    <span class="badge">Admin</span>
+  </div>
+  <div class="header-right">
+    <a href="/" class="btn-link">← Site</a>
+    <button class="btn-logout" onclick="logout()">Sair</button>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h2>Acesso Admin</h2>
+    <p>Insira o token de administrador para continuar.</p>
+    <label for="token-input">Token</label>
+    <input type="password" id="token-input" placeholder="••••••••" />
+    <button class="btn-primary" onclick="login()">Entrar</button>
+    <div class="status-msg err" id="login-status"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="admin-layout">
+
+    <!-- Criar post -->
+    <div class="panel-form">
+      <h2>Novo Post</h2>
+
+      <label>Título</label>
+      <input type="text" id="p-title" placeholder="Título do post" />
+
+      <label>Conteúdo</label>
+      <textarea id="p-content" placeholder="Escreva o conteúdo aqui…"></textarea>
+
+      <label>Autor</label>
+      <input type="text" id="p-author" placeholder="Nome do autor" />
+
+      <label>Tags (separadas por vírgula)</label>
+      <input type="text" id="p-tags" placeholder="tecnologia, design, vida" />
+      <p class="tags-hint">Ex: tecnologia, design, lifestyle</p>
+
+      <label>Cor de destaque</label>
+      <div class="color-row">
+        <input type="color" id="p-color" value="#e8c97e" />
+        <span class="color-label">Faixa colorida do card</span>
+      </div>
+
+      <button class="btn-primary" id="publish-btn" onclick="createPost()">Publicar Post</button>
+      <div class="status-msg" id="post-status"></div>
+    </div>
+
+    <!-- Lista de posts -->
+    <div class="panel-list">
+      <h2>
+        Posts publicados
+        <span class="post-count" id="post-count"></span>
+      </h2>
+      <div id="admin-posts-list"><div class="spinner"></div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API = '/api';
+  let adminToken = sessionStorage.getItem('admin_token');
+
+  // Init
+  if (adminToken) showPanel();
+
+  document.getElementById('token-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+
+  async function login() {
+    const token = document.getElementById('token-input').value.trim();
+    const status = document.getElementById('login-status');
+    if (!token) { status.textContent = 'Insira o token.'; return; }
+
+    try {
+      const res = await fetch(`${API}/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+
+      if (res.ok) {
+        adminToken = token;
+        sessionStorage.setItem('admin_token', token);
+        showPanel();
+      } else {
+        status.textContent = 'Token inválido.';
+      }
+    } catch {
+      status.textContent = 'Erro de conexão.';
+    }
+  }
+
+  function showPanel() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    loadAdminPosts();
+  }
+
+  function logout() {
+    sessionStorage.removeItem('admin_token');
+    adminToken = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('token-input').value = '';
+  }
+
+  async function loadAdminPosts() {
+    const list = document.getElementById('admin-posts-list');
+    try {
+      const res = await fetch(`${API}/posts`);
+      const posts = await res.json();
+
+      document.getElementById('post-count').textContent = `${posts.length} post${posts.length !== 1 ? 's' : ''}`;
+
+      if (!posts.length) {
+        list.innerHTML = '<p class="empty-msg">Nenhum post ainda.</p>';
+        return;
+      }
+
+      list.innerHTML = posts.map(p => `
+        <div class="admin-post-item" id="pi-${p.id}">
+          <div class="apost-cover" style="background:${p.coverColor}"></div>
+          <div class="apost-info">
+            <div class="apost-title">${p.title}</div>
+            <div class="apost-meta">Por ${p.author} &mdash; ${new Date(p.createdAt).toLocaleDateString('pt-BR')}</div>
+          </div>
+          <div class="apost-actions">
+            <a class="btn-view" href="/post.html?id=${p.id}" target="_blank">Ver</a>
+            <button class="btn-delete" onclick="deletePost('${p.id}')">Deletar</button>
+          </div>
+        </div>`).join('');
+    } catch {
+      list.innerHTML = '<p class="empty-msg" style="color:var(--danger)">Erro ao carregar posts.</p>';
+    }
+  }
+
+  async function createPost() {
+    const title = document.getElementById('p-title').value.trim();
+    const content = document.getElementById('p-content').value.trim();
+    const author = document.getElementById('p-author').value.trim();
+    const tagsRaw = document.getElementById('p-tags').value.trim();
+    const coverColor = document.getElementById('p-color').value;
+    const btn = document.getElementById('publish-btn');
+    const status = document.getElementById('post-status');
+
+    if (!title || !content) {
+      status.textContent = 'Título e conteúdo são obrigatórios.';
+      status.className = 'status-msg err';
+      return;
+    }
+
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+    btn.disabled = true;
+    status.textContent = 'Publicando…';
+    status.className = 'status-msg';
+
+    try {
+      const res = await fetch(`${API}/posts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-token': adminToken
+        },
+        body: JSON.stringify({ title, content, author: author || 'Admin', tags, coverColor })
+      });
+
+      if (!res.ok) throw new Error();
+
+      // Reset form
+      document.getElementById('p-title').value = '';
+      document.getElementById('p-content').value = '';
+      document.getElementById('p-author').value = '';
+      document.getElementById('p-tags').value = '';
+      document.getElementById('p-color').value = '#e8c97e';
+
+      status.textContent = 'Post publicado com sucesso! ✓';
+      status.className = 'status-msg ok';
+      loadAdminPosts();
+    } catch {
+      status.textContent = 'Erro ao publicar. Verifique e tente novamente.';
+      status.className = 'status-msg err';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function deletePost(id) {
+    if (!confirm('Deletar este post e todos os seus comentários?')) return;
+
+    try {
+      const res = await fetch(`${API}/posts?id=${id}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-token': adminToken }
+      });
+
+      if (res.ok) {
+        const el = document.getElementById(`pi-${id}`);
+        if (el) el.remove();
+        loadAdminPosts();
+      } else {
+        alert('Erro ao deletar.');
+      }
+    } catch {
+      alert('Erro de conexão.');
+    }
+  }
+</script>
+</body>
+</html>

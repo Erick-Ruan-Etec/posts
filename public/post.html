@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Post — Blog</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg: #0e0e0e;
+                --surface: #161616;
+                --border: #2a2a2a;
+                --text: #f0ece4;
+                --muted: #888;
+                --accent: #e8c97e;
+                --accent2: #c46a3a;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                background: var(--bg);
+                color: var(--text);
+                font-family: "DM Sans", sans-serif;
+            }
+
+            header {
+                border-bottom: 1px solid var(--border);
+                padding: 0 clamp(1.5rem, 5vw, 4rem);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 64px;
+                position: sticky;
+                top: 0;
+                background: rgba(14, 14, 14, 0.92);
+                backdrop-filter: blur(12px);
+                z-index: 100;
+            }
+
+            .logo {
+                font-family: "Playfair Display", serif;
+                font-size: 1.4rem;
+                font-weight: 900;
+                color: var(--accent);
+                text-decoration: none;
+            }
+
+            .back-btn {
+                color: var(--muted);
+                text-decoration: none;
+                font-size: 0.83rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                transition: color 0.2s;
+            }
+            .back-btn:hover {
+                color: var(--text);
+            }
+
+            /* ── Cover strip ── */
+            #cover-strip {
+                height: 8px;
+                width: 100%;
+            }
+
+            /* ── Article ── */
+            article {
+                max-width: 740px;
+                margin: 0 auto;
+                padding: clamp(2rem, 6vw, 5rem) clamp(1.5rem, 5vw, 2rem);
+            }
+
+            .post-meta {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                flex-wrap: wrap;
+                margin-bottom: 1.5rem;
+            }
+
+            .tag {
+                font-size: 0.65rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--accent);
+                background: rgba(232, 201, 126, 0.1);
+                padding: 2px 8px;
+                border-radius: 2px;
+            }
+
+            .meta-info {
+                font-size: 0.78rem;
+                color: var(--muted);
+            }
+
+            h1 {
+                font-family: "Playfair Display", serif;
+                font-size: clamp(2rem, 5vw, 3.2rem);
+                font-weight: 900;
+                line-height: 1.15;
+                letter-spacing: -0.02em;
+                margin-bottom: 2rem;
+            }
+
+            .post-body {
+                font-size: 1.05rem;
+                line-height: 1.85;
+                color: #d8d4cc;
+                white-space: pre-wrap;
+            }
+
+            /* ── Divider ── */
+            .divider {
+                border: none;
+                border-top: 1px solid var(--border);
+                margin: 3rem 0;
+            }
+
+            /* ── Comments ── */
+            .comments-section h2 {
+                font-family: "Playfair Display", serif;
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .comment-form {
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .comment-form h3 {
+                font-size: 0.8rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--accent);
+                margin-bottom: 1rem;
+            }
+
+            .form-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            @media (max-width: 500px) {
+                .form-row {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            input,
+            textarea {
+                width: 100%;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                color: var(--text);
+                font-family: "DM Sans", sans-serif;
+                font-size: 0.9rem;
+                padding: 0.7rem 1rem;
+                outline: none;
+                transition: border-color 0.2s;
+                resize: vertical;
+            }
+
+            input:focus,
+            textarea:focus {
+                border-color: var(--accent);
+            }
+
+            textarea {
+                min-height: 100px;
+            }
+
+            .submit-btn {
+                background: var(--accent);
+                color: #0e0e0e;
+                border: none;
+                border-radius: 3px;
+                padding: 0.7rem 1.8rem;
+                font-family: "DM Sans", sans-serif;
+                font-size: 0.85rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: opacity 0.2s;
+                margin-top: 0.5rem;
+            }
+
+            .submit-btn:hover {
+                opacity: 0.85;
+            }
+            .submit-btn:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+            .form-status {
+                font-size: 0.82rem;
+                margin-top: 0.5rem;
+                min-height: 1.2em;
+            }
+            .form-status.ok {
+                color: #6fcf97;
+            }
+            .form-status.err {
+                color: #eb5757;
+            }
+
+            /* ── Comment list ── */
+            .comments-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .comment-item {
+                border-left: 2px solid var(--border);
+                padding: 1rem 1.2rem;
+                transition: border-color 0.2s;
+            }
+
+            .comment-item:hover {
+                border-color: var(--accent);
+            }
+
+            .comment-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 0.5rem;
+            }
+
+            .comment-author {
+                font-size: 0.85rem;
+                font-weight: 500;
+                color: var(--accent);
+            }
+
+            .comment-date {
+                font-size: 0.72rem;
+                color: var(--muted);
+            }
+
+            .comment-content {
+                font-size: 0.9rem;
+                line-height: 1.6;
+                color: #bbb;
+            }
+
+            .no-comments {
+                color: var(--muted);
+                font-size: 0.9rem;
+            }
+
+            /* ── Loading ── */
+            .spinner {
+                width: 28px;
+                height: 28px;
+                border: 2px solid var(--border);
+                border-top-color: var(--accent);
+                border-radius: 50%;
+                animation: spin 0.7s linear infinite;
+                margin: 3rem auto;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <a href="/" class="logo">The Blog</a>
+            <a href="/" class="back-btn">← Voltar</a>
+        </header>
+
+        <div id="cover-strip"></div>
+
+        <div id="app">
+            <div class="spinner"></div>
+        </div>
+
+        <script>
+            const API = "/api";
+            const params = new URLSearchParams(location.search);
+            const postId = params.get("id");
+
+            function formatDate(iso) {
+                return new Date(iso).toLocaleDateString("pt-BR", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                });
+            }
+
+            async function loadPost() {
+                if (!postId) {
+                    document.getElementById("app").innerHTML =
+                        '<article><p style="color:var(--muted)">Post não encontrado.</p></article>';
+                    return;
+                }
+                try {
+                    const res = await fetch(`${API}/posts?id=${postId}`);
+                    if (!res.ok) throw new Error();
+                    const post = await res.json();
+                    renderPost(post);
+                    loadComments();
+                } catch {
+                    document.getElementById("app").innerHTML =
+                        '<article><p style="color:var(--muted)">Erro ao carregar o post.</p></article>';
+                }
+            }
+
+            function renderPost(post) {
+                document.title = `${post.title} — Blog`;
+                document.getElementById("cover-strip").style.background =
+                    post.coverColor || "#e8c97e";
+
+                const tags = (post.tags || [])
+                    .map((t) => `<span class="tag">${t}</span>`)
+                    .join("");
+
+                document.getElementById("app").innerHTML = `
+      <article>
+        <div class="post-meta">
+          ${tags}
+          <span class="meta-info">Por <strong>${post.author}</strong> &mdash; ${formatDate(post.createdAt)}</span>
+        </div>
+        <h1>${post.title}</h1>
+        <div class="post-body">${post.content}</div>
+
+        <hr class="divider" />
+
+        <section class="comments-section">
+          <h2>Comentários</h2>
+
+          <div class="comment-form">
+            <h3>Deixe seu comentário</h3>
+            <div class="form-row">
+              <input id="c-author" type="text" placeholder="Seu nome" maxlength="50" />
+            </div>
+            <textarea id="c-content" placeholder="O que você achou?" maxlength="1000"></textarea>
+            <br/>
+            <button class="submit-btn" id="c-submit" onclick="submitComment()">Enviar comentário</button>
+            <div class="form-status" id="c-status"></div>
+          </div>
+
+          <div class="comments-list" id="comments-list">
+            <div class="spinner"></div>
+          </div>
+        </section>
+      </article>`;
+            }
+
+            async function loadComments() {
+                const list = document.getElementById("comments-list");
+                if (!list) return;
+                try {
+                    const res = await fetch(`${API}/comments?postId=${postId}`);
+                    const comments = await res.json();
+
+                    if (!comments.length) {
+                        list.innerHTML =
+                            '<p class="no-comments">Seja o primeiro a comentar!</p>';
+                        return;
+                    }
+
+                    list.innerHTML = comments
+                        .map(
+                            (c) => `
+        <div class="comment-item">
+          <div class="comment-header">
+            <span class="comment-author">${c.author}</span>
+            <span class="comment-date">${formatDate(c.createdAt)}</span>
+          </div>
+          <div class="comment-content">${c.content}</div>
+        </div>`,
+                        )
+                        .join("");
+                } catch {
+                    list.innerHTML =
+                        '<p class="no-comments" style="color:var(--muted)">Erro ao carregar comentários.</p>';
+                }
+            }
+
+            async function submitComment() {
+                const author = document.getElementById("c-author").value.trim();
+                const content = document
+                    .getElementById("c-content")
+                    .value.trim();
+                const btn = document.getElementById("c-submit");
+                const status = document.getElementById("c-status");
+
+                if (!author || !content) {
+                    status.textContent = "Preencha seu nome e comentário.";
+                    status.className = "form-status err";
+                    return;
+                }
+
+                btn.disabled = true;
+                status.textContent = "Enviando…";
+                status.className = "form-status";
+
+                try {
+                    const res = await fetch(
+                        `${API}/comments?postId=${postId}`,
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ author, content }),
+                        },
+                    );
+
+                    if (!res.ok) throw new Error();
+
+                    document.getElementById("c-author").value = "";
+                    document.getElementById("c-content").value = "";
+                    status.textContent = "Comentário enviado! ✓";
+                    status.className = "form-status ok";
+                    loadComments();
+                } catch {
+                    status.textContent = "Erro ao enviar. Tente novamente.";
+                    status.className = "form-status err";
+                } finally {
+                    btn.disabled = false;
+                }
+            }
+
+            loadPost();
+        </script>
+    </body>
+</html>

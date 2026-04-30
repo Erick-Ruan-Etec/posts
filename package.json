@@ -1,0 +1,8 @@
+{
+  "name": "blog-vercel-blobs",
+  "version": "1.0.0",
+  "description": "Sistema de posts com Vercel Blobs",
+  "dependencies": {
+    "@vercel/blob": "^0.23.0"
+  }
+}
